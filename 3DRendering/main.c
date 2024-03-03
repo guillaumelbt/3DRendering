@@ -6,13 +6,18 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 bool bIsRunning = false;
 
+int width = 800;
+int height = 600;
+uint32_t* colorBuffer = NULL;
+
+
 bool InitializeWindow(void) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		fprintf(stderr, "Error Init SDL");
 		return false;
 	}
 
-	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_BORDERLESS);
+	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,SDL_WINDOW_BORDERLESS);
 
 	if (!window) {
 		fprintf(stderr, "Error creating window");
@@ -30,7 +35,7 @@ bool InitializeWindow(void) {
 }
 
 void Setup(void) {
-
+	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * width * height);
 }
 
 void ProcessInput(void) {
