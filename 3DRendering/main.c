@@ -40,6 +40,10 @@ void Setup(void) {
 
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * width * height);
 
+	if (!colorBuffer) {
+		bIsRunning = false;
+	}
+
 }
 
 void ProcessInput(void) {
@@ -81,5 +85,10 @@ int main(int argc, char* args[]) {
 		Update(1);
 		Render();
 	}
+
+	free(colorBuffer);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 	return 0;
 }
