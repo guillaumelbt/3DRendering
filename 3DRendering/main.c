@@ -1,50 +1,8 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <SDL.h>
+#include "Display.h"
 
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
+
 bool bIsRunning = false;
 
-SDL_Texture* colorBufferTexture = NULL;
-uint32_t* colorBuffer = NULL;
-
-int width = 800;
-int height = 600;
-
-
-
-
-bool InitializeWindow(void) {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		fprintf(stderr, "Error Init SDL");
-		return false;
-	}
-
-	SDL_DisplayMode displayMode;
-	SDL_GetCurrentDisplayMode(0, &displayMode);
-
-	width = displayMode.w;
-	height = displayMode.h;	
-
-	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,width,height,SDL_WINDOW_BORDERLESS);
-
-	if (!window) {
-		fprintf(stderr, "Error creating window");
-		return false;
-	}
-
-	renderer = SDL_CreateRenderer(window, -1, 0);
-
-	if(!renderer) {
-		fprintf(stderr, "Error creating renderer");
-		return false;
-	}
-
-	
-	return true;
-
-}
 
 void Setup(void) {
 
@@ -52,11 +10,11 @@ void Setup(void) {
 		renderer,
 		SDL_PIXELFORMAT_ARGB8888,
 		SDL_TEXTUREACCESS_STREAMING,
-		width,
-		height
+		windowWidth,
+		windowHeight
 	);
 
-	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * width * height);
+	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
 
 	if (!colorBuffer) {
 		bIsRunning = false;
@@ -83,25 +41,6 @@ void ProcessInput(void) {
 
 }
 
-void ClearColorBuffer(uint32_t color) {
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++)
-		{
-			colorBuffer[(width * y) + x] = color;
-		}
-	}
-}
-
-
-void RenderColorBuffer() {
-	SDL_UpdateTexture(
-		colorBufferTexture,
-		NULL,
-		colorBuffer,
-		(int)(width * sizeof(uint32_t))
-	);
-	SDL_RenderCopy(renderer, colorBufferTexture, NULL, NULL);
-}
 
 void Update(float deltaTime) {
 
@@ -111,8 +50,10 @@ void Render(void) {
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderClear(renderer);
 
+	DrawGrid();
+	DrawRectangle(300, 200, 400, 250, 0xFF33FF33);
 	RenderColorBuffer();
-	ClearColorBuffer(0xFFFFFF00);
+	ClearColorBuffer(0xFF000000);
 	SDL_RenderPresent(renderer);
 }
 
@@ -127,9 +68,6 @@ int main(int argc, char* args[]) {
 		Render();
 	}
 
-	free(colorBuffer);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	DestroyWindow();
 	return 0;
 }
