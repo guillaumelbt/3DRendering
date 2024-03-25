@@ -5,12 +5,13 @@
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 bool bIsRunning = false;
-SDL_Texture* colorBufferTexture = NULL;
 
+SDL_Texture* colorBufferTexture = NULL;
+uint32_t* colorBuffer = NULL;
 
 int width = 800;
 int height = 600;
-uint32_t* colorBuffer = NULL;
+
 
 
 
@@ -20,7 +21,13 @@ bool InitializeWindow(void) {
 		return false;
 	}
 
-	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_BORDERLESS);
+	SDL_DisplayMode displayMode;
+	SDL_GetCurrentDisplayMode(0, &displayMode);
+
+	width = displayMode.w;
+	height = displayMode.h;	
+
+	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,width,height,SDL_WINDOW_BORDERLESS);
 
 	if (!window) {
 		fprintf(stderr, "Error creating window");
@@ -34,18 +41,20 @@ bool InitializeWindow(void) {
 		return false;
 	}
 
-	colorBufferTexture = SDL_CreateTexture(
-		renderer,
-		SDL_PIXELFORMAT_ABGR8888,
-		SDL_TEXTUREACCESS_STREAMING,
-		width,
-		height
-	);
+	
 	return true;
 
 }
 
 void Setup(void) {
+
+	colorBufferTexture = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING,
+		width,
+		height
+	);
 
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * width * height);
 
@@ -101,6 +110,8 @@ void Update(float deltaTime) {
 void Render(void) {
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderClear(renderer);
+
+	RenderColorBuffer();
 	ClearColorBuffer(0xFFFFFF00);
 	SDL_RenderPresent(renderer);
 }
