@@ -3,6 +3,7 @@
 
 bool bIsRunning = false;
 
+float previousFrameTime = 0;
 
 #define N_POINTS (9 * 9 * 9)
 
@@ -68,6 +69,14 @@ vec2 Project(vec3 point) {
 }
 
 void Update(float deltaTime) {
+
+	int timeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - previousFrameTime);
+
+	if (timeToWait > 0 && timeToWait <= FRAME_TARGET_TIME) {
+		SDL_Delay(timeToWait);
+	}
+	previousFrameTime = SDL_GetTicks();
+
 	cubeRotation.x += 0.01;
 	cubeRotation.y += 0.01;
 	cubeRotation.z += 0.01;
