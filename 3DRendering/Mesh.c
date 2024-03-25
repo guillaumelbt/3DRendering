@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 
-vec3 meshVertices[N_MESH_VERTICES] = {
+vec3 cubeVertices[N_CUBE_VERTICES] = {
 	{ -1, -1 , -1 },	//1
 	{ -1,  1 , -1 },	//2
 	{  1,  1 , -1 },	//3
@@ -12,7 +12,7 @@ vec3 meshVertices[N_MESH_VERTICES] = {
 	{ -1, -1 ,  1 }		//8 
 };
 
-face meshFaces[N_MESH_FACES] = {
+face cubeFaces[N_CUBE_FACES] = {
 	{ 1 , 2 , 3 },
 	{ 1 , 3 , 4 },
 
@@ -31,3 +31,10 @@ face meshFaces[N_MESH_FACES] = {
 	{ 6 , 8 , 1 },
 	{ 6 , 1 , 4 },
 };
+
+void LoadCubeMeshData(void) {
+	for (int i = 0; i < N_CUBE_VERTICES; i++)
+	{
+		array_push(mesh.vertices,)
+	}
+}

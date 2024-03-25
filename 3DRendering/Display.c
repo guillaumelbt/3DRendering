@@ -93,3 +93,30 @@ void DrawPixel(int x, int y, uint32_t color) {
 	if(x >= 0 && x < windowWidth && y < windowHeight && y >= 0)
 		colorBuffer[(windowWidth * y) + x] = color;
 }
+
+void DrawLine(int x0, int y0, int x1, int y1, uint32_t color) {
+	int deltaX = (x1 - x0);
+	int deltaY = (y1 - y0);
+
+	int sideLength = abs(deltaX) >= abs(deltaY) ? abs(deltaX) : abs(deltaY);
+
+	float xInc = deltaX / (float)sideLength;
+	float yInc = deltaY / (float)sideLength;
+
+	float curX = x0;
+	float curY = y0;
+
+	for (size_t i = 0; i < sideLength; i++)
+	{
+		DrawPixel(round(curX), round(curY), color);
+		curX += xInc;
+		curY += yInc;
+	}
+}
+
+void DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+	DrawLine(x0, y0, x1, y1, color);
+	DrawLine(x1, y1, x2, y2, color);
+	DrawLine(x2, y2, x0, y0, color);
+
+}

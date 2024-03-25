@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="array.c" />
     <ClCompile Include="Display.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Mesh.c" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Vector.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="array.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Triangle.h" />

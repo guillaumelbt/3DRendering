@@ -1,12 +1,16 @@
 #include "Display.h"
 #include "Vector.h"
 #include "Mesh.h"
+#include "array.h";
+
+
+triangle* trianglesToRender = NULL;
 
 bool bIsRunning = false;
 
 float previousFrameTime = 0;
 
-triangle trianglesToRender[N_MESH_FACES];
+//triangle trianglesToRender[N_MESH_FACES];
 
 vec3 cameraPosition = { 0 , 0 , -5 };
 
@@ -66,26 +70,29 @@ vec2 Project(vec3 point) {
 	return projectedPoint;
 }
 
-void Update(float deltaTime) {
+void Update(void) {
 
 	int timeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - previousFrameTime);
 
 	if (timeToWait > 0 && timeToWait <= FRAME_TARGET_TIME) {
 		SDL_Delay(timeToWait);
 	}
+
+	trianglesToRender = NULL;
+
 	previousFrameTime = SDL_GetTicks();
 
 	cubeRotation.x += 0.01;
 	cubeRotation.y += 0.01;
 	cubeRotation.z += 0.01;
 
-	for (int i = 0; i < N_MESH_FACES; i++)
+	for (int i = 0; i < N_CUBE_FACES; i++)
 	{
-		face curFace = meshFaces[i];
+		face curFace = cubeFaces[i];
 		vec3 faceVertices[3];
-		faceVertices[0] = meshVertices[curFace.a - 1];
-		faceVertices[1] = meshVertices[curFace.b - 1];
-		faceVertices[2] = meshVertices[curFace.c - 1];
+		faceVertices[0] = cubeVertices[curFace.a - 1];
+		faceVertices[1] = cubeVertices[curFace.b - 1];
+		faceVertices[2] = cubeVertices[curFace.c - 1];
 		triangle projectedTriangle;
 		for (int j = 0; j < 3; j++) {
 			vec3 transformedVertex = faceVertices[j];
@@ -103,7 +110,7 @@ void Update(float deltaTime) {
 
 			projectedTriangle.points[j] = projectedVertex;
 		}
-		trianglesToRender[i] = projectedTriangle;
+		array_push(trianglesToRender, projectedTriangle);
 	}
 
 	/*for (int i = 0; i < n_points; i++) {
@@ -122,14 +129,20 @@ void Render(void) {
 
 	DrawGrid();
 
-	for (int i = 0; i < N_MESH_FACES; i++) {
+	int numTriangles = array_length(trianglesToRender);
+
+	for (int i = 0; i < numTriangles; i++) {
 		triangle tri = trianglesToRender[i];
 		//vec2 projectedPoint = projectedPoints[i];
-		DrawRectangle(tri.points[0].x, tri.points[0].y,3, 3, 0xFF33FF33);
-		DrawRectangle(tri.points[1].x, tri.points[1].y, 3, 3, 0xFF33FF33);
-		DrawRectangle(tri.points[2].x, tri.points[2].y, 3, 3, 0xFF33FF33);
+		DrawRectangle(tri.points[0].x, tri.points[0].y, 5, 5, 0xFFFF3333);
+		DrawRectangle(tri.points[1].x, tri.points[1].y, 5, 5, 0xFFFF3333);
+		DrawRectangle(tri.points[2].x, tri.points[2].y, 5, 5, 0xFFFF3333);
+
+		DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, 0xFF33FF33);
 	}
 	
+	array_free(trianglesToRender);
+
 	RenderColorBuffer();
 	ClearColorBuffer(0xFF000000);
 	
@@ -143,7 +156,7 @@ int main(int argc, char* args[]) {
 
 	while (bIsRunning) {
 		ProcessInput();
-		Update(1);
+		Update();
 		Render();
 	}
 
