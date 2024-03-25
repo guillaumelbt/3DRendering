@@ -14,7 +14,8 @@ vec3 cubeVertices[N_CUBE_VERTICES] = {
 
 face cubeFaces[N_CUBE_FACES] = {
 	{ 1 , 2 , 3 },
-	{ 1 , 3 , 4 },
+	{ 1 , 3 , 4 },git add .
+
 
 	{ 4 , 3 , 5 },
 	{ 4 , 5 , 6 },
