@@ -35,6 +35,7 @@ face cubeFaces[N_CUBE_FACES] = {
 void LoadCubeMeshData(void) {
 	for (int i = 0; i < N_CUBE_VERTICES; i++)
 	{
+		vec3 cubeVertex = cubeVertices
 		array_push(mesh.vertices,)
 	}
 }
