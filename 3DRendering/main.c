@@ -1,14 +1,12 @@
 #include "Display.h"
 #include "Vector.h"
+#include "Mesh.h"
 
 bool bIsRunning = false;
 
 float previousFrameTime = 0;
 
-#define N_POINTS (9 * 9 * 9)
-
-vec3 cubePoints[N_POINTS];
-vec2 projectedPoints[N_POINTS];
+triangle trianglesToRender[N_MESH_FACES];
 
 vec3 cameraPosition = { 0 , 0 , -5 };
 
@@ -32,7 +30,7 @@ void Setup(void) {
 		bIsRunning = false;
 	}
 
-	int pointCount = 0;
+	/*int pointCount = 0;
 	for (float x = -1; x <= 1; x += 0.25) {
 		for (float y = -1; y <= 1; y += 0.25) {
 			for (float z = -1; z <= 1; z += 0.25) {
@@ -40,7 +38,7 @@ void Setup(void) {
 				cubePoints[pointCount++] = newPoint;
 			}
 		}
-	}
+	}*/
 }
 
 void ProcessInput(void) {
@@ -81,18 +79,41 @@ void Update(float deltaTime) {
 	cubeRotation.y += 0.01;
 	cubeRotation.z += 0.01;
 
+	for (int i = 0; i < N_MESH_FACES; i++)
+	{
+		face curFace = meshFaces[i];
+		vec3 faceVertices[3];
+		faceVertices[0] = meshVertices[curFace.a - 1];
+		faceVertices[1] = meshVertices[curFace.b - 1];
+		faceVertices[2] = meshVertices[curFace.c - 1];
+		triangle projectedTriangle;
+		for (int j = 0; j < 3; j++) {
+			vec3 transformedVertex = faceVertices[j];
 
-	for (int i = 0; i < N_POINTS; i++) {
-		vec3 point = cubePoints[i];
+			transformedVertex = RotateX(transformedVertex, cubeRotation.x);
+			transformedVertex = RotateY(transformedVertex, cubeRotation.y);
+			transformedVertex = RotateZ(transformedVertex, cubeRotation.z);
 
-		vec3 transformedPoint = RotateX(point, cubeRotation.x);
-		transformedPoint = RotateY(transformedPoint, cubeRotation.y);
-		transformedPoint = RotateZ(transformedPoint, cubeRotation.z);
+			transformedVertex.z -= cameraPosition.z;
 
-		transformedPoint.z -= cameraPosition.z;
+			vec2 projectedVertex = Project(transformedVertex);
 
-		projectedPoints[i] = Project(transformedPoint);
+			projectedVertex.x += windowWidth / 2;
+			projectedVertex.y += windowHeight / 2;
+
+			projectedTriangle.points[j] = projectedVertex;
+		}
+		trianglesToRender[i] = projectedTriangle;
 	}
+
+	/*for (int i = 0; i < n_points; i++) {
+		vec3 point = cubepoints[i];
+		vec3 transformedpoint = rotatex(point, cuberotation.x);
+		transformedpoint = rotatey(transformedpoint, cuberotation.y);
+		transformedpoint = rotatez(transformedpoint, cuberotation.z);
+		transformedpoint.z -= cameraposition.z;
+		projectedpoints[i] = project(transformedpoint);
+	}*/
 }
 
 void Render(void) {
@@ -100,14 +121,13 @@ void Render(void) {
 	//SDL_RenderClear(renderer);
 
 	DrawGrid();
-	for (int i = 0; i < N_POINTS; i++) {
-		vec2 projectedPoint = projectedPoints[i];
-		DrawRectangle(
-			projectedPoint.x + windowWidth/2, 
-			projectedPoint.y + windowHeight/2, 
-			4, 
-			4, 
-			0xFF33FF33);
+
+	for (int i = 0; i < N_MESH_FACES; i++) {
+		triangle tri = trianglesToRender[i];
+		//vec2 projectedPoint = projectedPoints[i];
+		DrawRectangle(tri.points[0].x, tri.points[0].y,3, 3, 0xFF33FF33);
+		DrawRectangle(tri.points[1].x, tri.points[1].y, 3, 3, 0xFF33FF33);
+		DrawRectangle(tri.points[2].x, tri.points[2].y, 3, 3, 0xFF33FF33);
 	}
 	
 	RenderColorBuffer();
