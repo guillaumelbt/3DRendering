@@ -54,7 +54,7 @@ void DrawGrid() {
 		for (int x = 0; x < windowWidth; x++)
 		{
 			if (x % 10 == 0 || y % 10 == 0) {
-				colorBuffer[(windowWidth * y) + x] = 0xFF333333;
+				DrawPixel(x,y, 0xFF333333);
 			}
 		}
 	}
@@ -66,7 +66,7 @@ void DrawRectangle(int x, int y, int width, int height, uint32_t color) {
 		{
 			int curX = x + i;
 			int curY = y + j;
-			colorBuffer[(windowWidth * curY) + curX] = color;
+			DrawPixel(curX, curY, color);
 		}
 	}
 }
@@ -86,4 +86,10 @@ void DestroyWindow(void) {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+
+void DrawPixel(int x, int y, uint32_t color) {
+	if(x >= 0 && x < windowWidth && y < windowHeight && y >= 0)
+		colorBuffer[(windowWidth * y) + x] = color;
 }
