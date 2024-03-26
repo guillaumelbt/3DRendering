@@ -20,6 +20,8 @@ float fovFactor = 640;
 
 void Setup(void) {
 
+	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
+
 	colorBufferTexture = SDL_CreateTexture(
 		renderer,
 		SDL_PIXELFORMAT_ARGB8888,
@@ -28,14 +30,12 @@ void Setup(void) {
 		windowHeight
 	);
 
-	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
-
 	if (!colorBuffer) {
 		bIsRunning = false;
 	}
 
-	LoadObjFileData("./Assets/cube.obj");
-	LoadCubeMeshData();
+	LoadObjFileData("Assets/f22.obj");
+	//LoadCubeMeshData();
 	/*int pointCount = 0;
 	for (float x = -1; x <= 1; x += 0.25) {
 		for (float y = -1; y <= 1; y += 0.25) {
