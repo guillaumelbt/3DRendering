@@ -34,6 +34,8 @@ void Setup(void) {
 		bIsRunning = false;
 	}
 
+	LoadObjFileData("./Assets/cube.obj");
+	LoadCubeMeshData();
 	/*int pointCount = 0;
 	for (float x = -1; x <= 1; x += 0.25) {
 		for (float y = -1; y <= 1; y += 0.25) {
@@ -82,24 +84,29 @@ void Update(void) {
 
 	previousFrameTime = SDL_GetTicks();
 
-	cubeRotation.x += 0.01;
-	cubeRotation.y += 0.01;
-	cubeRotation.z += 0.01;
+	mesh.rotation.x += 0.01;
+	mesh.rotation.y += 0.01;
+	mesh.rotation.z += 0.01;
 
-	for (int i = 0; i < N_CUBE_FACES; i++)
+
+	int numFaces = array_length(mesh.faces);
+	for (int i = 0; i < numFaces; i++)
 	{
-		face curFace = cubeFaces[i];
+		face meshFace = mesh.faces[i];
+
 		vec3 faceVertices[3];
-		faceVertices[0] = cubeVertices[curFace.a - 1];
-		faceVertices[1] = cubeVertices[curFace.b - 1];
-		faceVertices[2] = cubeVertices[curFace.c - 1];
+		faceVertices[0] = mesh.vertices[meshFace.a - 1];
+		faceVertices[1] = mesh.vertices[meshFace.b - 1];
+		faceVertices[2] = mesh.vertices[meshFace.c - 1];
+
 		triangle projectedTriangle;
+
 		for (int j = 0; j < 3; j++) {
 			vec3 transformedVertex = faceVertices[j];
 
-			transformedVertex = RotateX(transformedVertex, cubeRotation.x);
-			transformedVertex = RotateY(transformedVertex, cubeRotation.y);
-			transformedVertex = RotateZ(transformedVertex, cubeRotation.z);
+			transformedVertex = RotateX(transformedVertex, mesh.rotation.x);
+			transformedVertex = RotateY(transformedVertex, mesh.rotation.y);
+			transformedVertex = RotateZ(transformedVertex, mesh.rotation.z);
 
 			transformedVertex.z -= cameraPosition.z;
 
@@ -149,6 +156,12 @@ void Render(void) {
 	SDL_RenderPresent(renderer);
 }
 
+void FreeResources(void) {
+	free(colorBuffer);
+	array_free(mesh.faces);
+	array_free(mesh.vertices);
+}
+
 int main(int argc, char* args[]) {	
 	bIsRunning = InitializeWindow();
 
@@ -161,5 +174,6 @@ int main(int argc, char* args[]) {
 	}
 
 	DestroyWindow();
+	FreeResources();
 	return 0;
 }

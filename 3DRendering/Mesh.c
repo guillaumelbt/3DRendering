@@ -1,5 +1,12 @@
 #include "Mesh.h"
+#include "array.h"
+#include <stdio.h>
 
+mesh_t mesh = {
+	.vertices = NULL,
+	.faces = NULL,
+	.rotation = {0,0,0,}
+};
 
 vec3 cubeVertices[N_CUBE_VERTICES] = {
 	{ -1, -1 , -1 },	//1
@@ -14,7 +21,7 @@ vec3 cubeVertices[N_CUBE_VERTICES] = {
 
 face cubeFaces[N_CUBE_FACES] = {
 	{ 1 , 2 , 3 },
-	{ 1 , 3 , 4 },git add .
+	{ 1 , 3 , 4 },
 
 
 	{ 4 , 3 , 5 },
@@ -36,7 +43,17 @@ face cubeFaces[N_CUBE_FACES] = {
 void LoadCubeMeshData(void) {
 	for (int i = 0; i < N_CUBE_VERTICES; i++)
 	{
-		vec3 cubeVertex = cubeVertices
-		array_push(mesh.vertices,)
+		vec3 cubeVertex = cubeVertices[i];
+		array_push(mesh.vertices, cubeVertex);
 	}
+
+	for (int i = 0; i < N_CUBE_FACES; i++) {
+		face cubeFace = cubeFaces[i];
+		array_push(mesh.faces, cubeFace);
+	}
+}
+
+void LoadObjFileData(char* filename) {
+	FILE* file;
+	fopen_s(&file, filename, "r");
 }

@@ -20,6 +20,7 @@ extern mesh_t mesh;
 
 
 void LoadCubeMeshData(void);
+void LoadObjFileData(char* filename);
 
 #endif
 
