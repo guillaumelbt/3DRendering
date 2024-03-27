@@ -94,6 +94,8 @@ void Update(void) {
 	{
 		face meshFace = mesh.faces[i];
 
+		printf_s("%d\n", mesh.faces[i].a);
+
 		vec3 faceVertices[3];
 		faceVertices[0] = mesh.vertices[meshFace.a - 1];
 		faceVertices[1] = mesh.vertices[meshFace.b - 1];

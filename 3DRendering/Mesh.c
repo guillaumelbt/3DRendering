@@ -61,13 +61,17 @@ void LoadObjFileData(char* filename) {
 	char line[1024];
 
 	while (fgets(line, 1024, file)) {
-		
-		if (strncmp(line, "v", 2) == 0) {
+		//printf_s("%d\n", strncmp(line, "v", 2));
+		if (strncmp(line, "v", 2) == 1) {
+			
 			vec3 vertex;
 			sscanf_s(line, "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
+			/*printf_s("%f\n", vertex.x);
+			printf_s("%f\n", vertex.y);
+			printf_s("%f\n", vertex.z);*/
 			array_push(mesh.vertices, vertex);
 		}
-		if (strncmp(line, "f", 2) == 0) {
+		if (strncmp(line, "f", 2) == 1) {
 
 			int vertexIndices[3];
 			int textureIndices[3];
@@ -82,9 +86,12 @@ void LoadObjFileData(char* filename) {
 				vertexIndices[1],
 				vertexIndices[2]
 			};
+			//printf_s("%d\n", f.a);
+			//printf_s("%d\n", f.b);
+			//printf_s("%d\n", f.c);
 			array_push(mesh.faces, f);
 		}
 	}
-	printf("%d",array_length(mesh.vertices));
-	printf("%d", array_length(mesh.faces));
+	//printf_s("%d\n",array_length(mesh.vertices));
+	//printf_s("%d\n", array_length(mesh.faces));
 }
