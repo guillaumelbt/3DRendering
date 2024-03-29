@@ -6,7 +6,7 @@
 mesh_t mesh = {
 	.vertices = NULL,
 	.faces = NULL,
-	.rotation = {0,0,0,}
+	.rotation = {0,0,0}
 };
 
 vec3 cubeVertices[N_CUBE_VERTICES] = {
@@ -17,7 +17,7 @@ vec3 cubeVertices[N_CUBE_VERTICES] = {
 	{  1,  1 ,  1 },	//5
 	{  1, -1 ,  1 },	//6
 	{ -1,  1 ,  1 },	//7
-	{ -1, -1 ,  1 }		//8 
+	{ -1, -1 ,  1 }		//8
 };
 
 face cubeFaces[N_CUBE_FACES] = {
@@ -55,6 +55,13 @@ void LoadCubeMeshData(void) {
 }
 
 void LoadObjFileData(char* filename) {
+
+	mesh.vertices = NULL;
+	mesh.faces = NULL;
+	mesh.rotation.x = 0;
+	mesh.rotation.y = 0;
+	mesh.rotation.z = 0;
+
 	FILE* file;
 	fopen_s(&file, filename, "r");
 
@@ -66,9 +73,9 @@ void LoadObjFileData(char* filename) {
 			
 			vec3 vertex;
 			sscanf_s(line, "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
-			/*printf_s("%f\n", vertex.x);
+			printf_s("%f\n", vertex.x);
 			printf_s("%f\n", vertex.y);
-			printf_s("%f\n", vertex.z);*/
+			printf_s("%f\n", vertex.z);
 			array_push(mesh.vertices, vertex);
 		}
 		if (strncmp(line, "f", 2) == 1) {
@@ -82,15 +89,16 @@ void LoadObjFileData(char* filename) {
 				&vertexIndices[2], &textureIndices[2], &normalIndices[2]
 			);
 			face f = {
-				vertexIndices[0],
-				vertexIndices[1],
-				vertexIndices[2]
+				.a = vertexIndices[0],
+				.b = vertexIndices[1],
+				.c = vertexIndices[2]
 			};
 			//printf_s("%d\n", f.a);
 			//printf_s("%d\n", f.b);
 			//printf_s("%d\n", f.c);
 			array_push(mesh.faces, f);
 		}
+		//printf_s("%d\n", mesh.faces[0].a);
 	}
 	//printf_s("%d\n",array_length(mesh.vertices));
 	//printf_s("%d\n", array_length(mesh.faces));
