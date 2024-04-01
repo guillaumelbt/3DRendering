@@ -84,9 +84,9 @@ void Update(void) {
 
 	previousFrameTime = SDL_GetTicks();
 
-	mesh.rotation.x += 0.01;
+	mesh.rotation.x += 0.00;
 	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
+	mesh.rotation.z += 0.00;
 
 
 	int numFaces = array_length(mesh.faces);
@@ -143,9 +143,9 @@ void Render(void) {
 	for (int i = 0; i < numTriangles; i++) {
 		triangle tri = trianglesToRender[i];
 		//vec2 projectedPoint = projectedPoints[i];
-		DrawRectangle(tri.points[0].x, tri.points[0].y, 5, 5, 0xFFFF3333);
-		DrawRectangle(tri.points[1].x, tri.points[1].y, 5, 5, 0xFFFF3333);
-		DrawRectangle(tri.points[2].x, tri.points[2].y, 5, 5, 0xFFFF3333);
+		DrawRectangle(tri.points[0].x, tri.points[0].y, 3, 3, 0xFFFF3333);
+		DrawRectangle(tri.points[1].x, tri.points[1].y, 3, 3, 0xFFFF3333);
+		DrawRectangle(tri.points[2].x, tri.points[2].y, 3, 3, 0xFFFF3333);
 
 		DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, 0xFF33FF33);
 	}

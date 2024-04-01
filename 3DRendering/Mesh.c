@@ -56,50 +56,38 @@ void LoadCubeMeshData(void) {
 
 void LoadObjFileData(char* filename) {
 
-	mesh.vertices = NULL;
-	mesh.faces = NULL;
-	mesh.rotation.x = 0;
-	mesh.rotation.y = 0;
-	mesh.rotation.z = 0;
-
 	FILE* file;
 	fopen_s(&file, filename, "r");
 
-	char line[1024];
-
-	while (fgets(line, 1024, file)) {
-		//printf_s("%d\n", strncmp(line, "v", 2));
-		if (strncmp(line, "v", 2) == 1) {
-			
-			vec3 vertex;
-			sscanf_s(line, "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
-			printf_s("%f\n", vertex.x);
-			printf_s("%f\n", vertex.y);
-			printf_s("%f\n", vertex.z);
-			array_push(mesh.vertices, vertex);
-		}
-		if (strncmp(line, "f", 2) == 1) {
-
-			int vertexIndices[3];
-			int textureIndices[3];
-			int normalIndices[3];
-			sscanf_s(line, "f %d/%d/%d %d/%d/%d %d/%d/%d", 
-				&vertexIndices[0], &textureIndices[0], &normalIndices[0],
-				&vertexIndices[1], &textureIndices[1], &normalIndices[1], 
-				&vertexIndices[2], &textureIndices[2], &normalIndices[2]
-			);
-			face f = {
-				.a = vertexIndices[0],
-				.b = vertexIndices[1],
-				.c = vertexIndices[2]
-			};
-			//printf_s("%d\n", f.a);
-			//printf_s("%d\n", f.b);
-			//printf_s("%d\n", f.c);
-			array_push(mesh.faces, f);
-		}
-		//printf_s("%d\n", mesh.faces[0].a);
+	if (file == NULL) {
+		printf("cannot open file\n");
+		return -1;
 	}
-	//printf_s("%d\n",array_length(mesh.vertices));
-	//printf_s("%d\n", array_length(mesh.faces));
+
+	char line[256];
+	while (fgets(line, sizeof(line), file))
+	{
+		if (line[0] == 'v') {
+			float x, y, z;
+			int scanCount = sscanf_s(line, "v %f %f %f ", &x, &y, &z);
+			if (scanCount == 3) {
+				vec3 vertex;
+				vertex.x = x; vertex.y = y; vertex.z = z;
+				array_push(mesh.vertices, vertex);
+			}
+		}
+		if (line[0] == 'f') {
+			int a, b, c;
+			int scanCount = sscanf_s(line, "%*s %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &a, &b, &c);
+			if (scanCount == 3) {
+				face face;
+				face.a = a; 
+				face.b = b; 
+				face.c = c;
+				array_push(mesh.faces, face);
+			}
+		}
+	}
+
+	fclose(file);	
 }
