@@ -12,7 +12,7 @@ float previousFrameTime = 0;
 
 //triangle trianglesToRender[N_MESH_FACES];
 
-vec3 cameraPosition = { 0 , 0 , -5 };
+vec3 cameraPosition = { 0 , 0 , 0 };
 
 vec3 cubeRotation = { 0 , 0 , 0 };
 
@@ -88,13 +88,12 @@ void Update(void) {
 	mesh.rotation.y += 0.01;
 	mesh.rotation.z += 0.01;
 
-
 	int numFaces = array_length(mesh.faces);
 	for (int i = 0; i < numFaces; i++)
 	{
 		face meshFace = mesh.faces[i];
 
-		printf_s("%d\n", mesh.faces[i].a);
+		//printf_s("%d\n", mesh.faces[i].a);
 
 		vec3 faceVertices[3];
 		faceVertices[0] = mesh.vertices[meshFace.a - 1];
@@ -103,6 +102,8 @@ void Update(void) {
 
 		triangle projectedTriangle;
 
+		vec3 transformedVertices[3];
+
 		for (int j = 0; j < 3; j++) {
 			vec3 transformedVertex = faceVertices[j];
 
@@ -110,9 +111,29 @@ void Update(void) {
 			transformedVertex = RotateY(transformedVertex, mesh.rotation.y);
 			transformedVertex = RotateZ(transformedVertex, mesh.rotation.z);
 
-			transformedVertex.z -= cameraPosition.z;
+			transformedVertex.z += 5;
 
-			vec2 projectedVertex = Project(transformedVertex);
+			transformedVertices[j] = transformedVertex;
+		}
+
+		vec3 a = transformedVertices[0];
+		vec3 b = transformedVertices[1];
+		vec3 c = transformedVertices[2];
+
+		vec3 ab = Vec3Sub(b, a);
+		vec3 ac = Vec3Sub(c, a);
+
+		vec3 normal = Vec3CrossProduct(ab,ac);
+
+		vec3 cameraRay = Vec3Sub(cameraPosition, a);
+
+		float dot = Vec3Dot(normal, cameraRay);
+
+		if (dot < 0)
+			continue;
+
+		for (int j = 0; j < 3; j++) {
+			vec2 projectedVertex = Project(transformedVertices[j]);
 
 			projectedVertex.x += windowWidth / 2;
 			projectedVertex.y += windowHeight / 2;
