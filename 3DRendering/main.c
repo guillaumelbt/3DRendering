@@ -84,9 +84,9 @@ void Update(void) {
 
 	previousFrameTime = SDL_GetTicks();
 
-	mesh.rotation.x += 0.00;
+	mesh.rotation.x += 0.01;
 	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.00;
+	mesh.rotation.z += 0.01;
 
 
 	int numFaces = array_length(mesh.faces);
