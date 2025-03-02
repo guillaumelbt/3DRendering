@@ -3,7 +3,6 @@
 #include "Mesh.h"
 #include "array.h";
 
-
 triangle* trianglesToRender = NULL;
 
 bool bIsRunning = false;
@@ -20,6 +19,10 @@ float fovFactor = 640;
 
 void Setup(void) {
 
+	renderMethod |= RENDER_WIRE; 
+	renderMethod |= RENDER_TRIANGLE_FILLED;
+	cullMethod = CULL_BACKFACE;
+
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
 
 	colorBufferTexture = SDL_CreateTexture(
@@ -34,8 +37,8 @@ void Setup(void) {
 		bIsRunning = false;
 	}
 
-	//LoadObjFileData("Assets/f22.obj");
-	LoadObjFileData("Assets/cube.obj");
+	LoadObjFileData("Assets/f22.obj");
+
 	//LoadCubeMeshData();
 	/*int pointCount = 0;
 	for (float x = -1; x <= 1; x += 0.25) {
@@ -53,23 +56,23 @@ void ProcessInput(void) {
 	SDL_PollEvent(&event);
 
 	switch (event.type) {
-		case SDL_QUIT:
+	case SDL_QUIT:
+		bIsRunning = false;
+		break;
+	case SDL_KEYDOWN:
+		switch (event.key.keysym.sym) {
+		case SDLK_ESCAPE:
 			bIsRunning = false;
 			break;
-		case SDL_KEYDOWN:
-			switch (event.key.keysym.sym) {
-				case SDLK_ESCAPE:
-					bIsRunning = false;
-					break;
-			}
-			break;
+		}
+		break;
 	}
 
 }
 
 
 vec2 Project(vec3 point) {
-	vec2 projectedPoint = { (fovFactor * point.x) / point.z, (fovFactor * point.y) / point.z};
+	vec2 projectedPoint = { (fovFactor * point.x) / point.z, (fovFactor * point.y) / point.z };
 	return projectedPoint;
 }
 
@@ -117,21 +120,27 @@ void Update(void) {
 			transformedVertices[j] = transformedVertex;
 		}
 
-		vec3 a = transformedVertices[0];
-		vec3 b = transformedVertices[1];
-		vec3 c = transformedVertices[2];
+		if (cullMethod == CULL_BACKFACE)
+		{
+			vec3 a = transformedVertices[0];
+			vec3 b = transformedVertices[1];
+			vec3 c = transformedVertices[2];
 
-		vec3 ab = Vec3Sub(b, a);
-		vec3 ac = Vec3Sub(c, a);
+			vec3 ab = Vec3Sub(b, a);
+			vec3 ac = Vec3Sub(c, a);
+			Vec3Normalize(&ab);
+			Vec3Normalize(&ac);
 
-		vec3 normal = Vec3CrossProduct(ab,ac);
-		normal = Vec3Div(normal, Vec3Lenght(normal));
 
-		vec3 cameraRay = Vec3Sub(a, cameraPosition);
-		float dot = Vec3Dot(normal, cameraRay);
+			vec3 normal = Vec3CrossProduct(ab, ac);
+			Vec3Normalize(&normal);
 
-		if (dot > 0) 
-			continue;
+			vec3 cameraRay = Vec3Sub(a, cameraPosition);
+			float dot = Vec3Dot(normal, cameraRay);
+
+			if (dot > 0)
+				continue;
+		}
 
 
 		for (int j = 0; j < 3; j++) {
@@ -142,6 +151,7 @@ void Update(void) {
 
 			projectedTriangle.points[j] = projectedVertex;
 		}
+
 		array_push(trianglesToRender, projectedTriangle);
 	}
 
@@ -165,20 +175,27 @@ void Render(void) {
 
 	for (int i = 0; i < numTriangles; i++) {
 		triangle tri = trianglesToRender[i];
-		//vec2 projectedPoint = projectedPoints[i];
-		/*DrawRectangle(tri.points[0].x, tri.points[0].y, 3, 3, 0xFFFF3333);
-		DrawRectangle(tri.points[1].x, tri.points[1].y, 3, 3, 0xFFFF3333);
-		DrawRectangle(tri.points[2].x, tri.points[2].y, 3, 3, 0xFFFF3333);*/
 
-		DrawFilledTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, 0xFF33FF33);
-		DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, 0xFF000000);
+		if (renderMethod & RENDER_VERTEX)
+		{
+			//vec2 projectedPoint = projectedPoints[i];
+			DrawRectangle(tri.points[0].x, tri.points[0].y, 3, 3, 0xFFFF3333);
+			DrawRectangle(tri.points[1].x, tri.points[1].y, 3, 3, 0xFFFF3333);
+			DrawRectangle(tri.points[2].x, tri.points[2].y, 3, 3, 0xFFFF3333);
+		}
+
+		if (renderMethod & RENDER_TRIANGLE_FILLED)
+			DrawFilledTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, 0xFF33FF33);
+
+		if (renderMethod & RENDER_WIRE)
+			DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, 0xFF000000);
 	}
 
 	array_free(trianglesToRender);
 
 	RenderColorBuffer();
 	ClearColorBuffer(0xFF000000);
-	
+
 	SDL_RenderPresent(renderer);
 }
 
@@ -188,7 +205,7 @@ void FreeResources(void) {
 	array_free(mesh.vertices);
 }
 
-int main(int argc, char* args[]) {	
+int main(int argc, char* args[]) {
 	bIsRunning = InitializeWindow();
 
 	Setup();

@@ -9,6 +9,19 @@
 #define FPS 60
 #define FRAME_TARGET_TIME (1000 / FPS)
 
+enum cull_method
+{
+	CULL_NONE,
+	CULL_BACKFACE
+} cullMethod;
+
+enum render_method
+{
+	RENDER_VERTEX = 1 << 0,
+	RENDER_WIRE = 1 << 1,
+	RENDER_TRIANGLE_FILLED = 1 << 2
+} renderMethod;
+
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 

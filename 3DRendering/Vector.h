@@ -31,5 +31,5 @@ float Vec3Dot(vec3 a, vec3 b);
 vec3 RotateX(vec3 v, float angle);
 vec3 RotateY(vec3 v, float angle);
 vec3 RotateZ(vec3 v, float angle);
-
+void Vec3Normalize(vec3* v);
 #endif

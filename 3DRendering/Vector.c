@@ -133,3 +133,10 @@ vec3 RotateZ(vec3 v, float angle) {
 	};
 	return rotatedVector;
 }
+
+void Vec3Normalize(vec3* v) {
+	float length = sqrt(v->x * v->x + v->y * v->y + v->z * v->z);
+	v->x /= length;
+	v->y /= length;
+	v->z /= length;
+}
