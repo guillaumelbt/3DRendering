@@ -87,3 +87,29 @@ mat4x4 mat4x4Mult(mat4x4 a, mat4x4 b)
 	}
 	return m;
 }
+
+mat4x4 mat4x4MakePerspective(float fov, float aspectRatio, float zNear, float zFar)
+{
+	mat4x4 m = { {{0}} };
+	m.m[0][0] = 1 / (aspectRatio * tan(fov / 2));
+	m.m[1][1] = 1 / tan(fov / 2);
+	m.m[2][2] = zFar / (zFar - zNear);
+	m.m[2][3] = (-zFar * zNear) / (zFar - zNear);
+	m.m[3][2] = 1.0;
+
+	return m;
+}
+
+
+vec4 mat4x4MultVec4Project(mat4x4 projectionMatrix, vec4 v)
+{
+	vec4 res = mat4x4MultVec4(projectionMatrix, v);
+
+	if (res.w != 0.0)
+	{
+		res.x /= res.w;
+		res.y /= res.w;
+		res.z /= res.w;
+	}
+	return res;
+}

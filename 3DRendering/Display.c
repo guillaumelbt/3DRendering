@@ -6,8 +6,8 @@ SDL_Renderer* renderer = NULL;
 SDL_Texture* colorBufferTexture = NULL;
 uint32_t* colorBuffer = NULL;
 
-int windowWidth = 800;
-int windowHeight = 600;
+int windowWidth = 1920;
+int windowHeight = 1080;
 
 bool InitializeWindow(void) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {

@@ -13,14 +13,13 @@ float previousFrameTime = 0;
 //triangle trianglesToRender[N_MESH_FACES];
 
 vec3 cameraPosition = { 0 , 0 , 0 };
-
-float fovFactor = 640;
+mat4x4 projectionMatrix;
 
 void Setup(void) {
 
 	renderMethod |= RENDER_WIRE; 
-	renderMethod |= RENDER_TRIANGLE_FILLED;
-	cullMethod = CULL_BACKFACE;
+	//renderMethod |= RENDER_TRIANGLE_FILLED;
+	//cullMethod = CULL_BACKFACE;
 
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
 
@@ -31,6 +30,13 @@ void Setup(void) {
 		windowWidth,
 		windowHeight
 	);
+
+	float fov = M_PI / 3.0;
+	float aspectRatio = (float)windowWidth / (float)windowHeight;
+	float zNear = 0.1;
+	float zFar = 100.0;
+
+	projectionMatrix = mat4x4MakePerspective(fov,aspectRatio,zNear,zFar);
 
 	if (!colorBuffer) {
 		bIsRunning = false;
@@ -68,12 +74,6 @@ void ProcessInput(void) {
 
 }
 
-
-vec2 Project(vec3 point) {
-	vec2 projectedPoint = { (fovFactor * point.x) / point.z, (fovFactor * point.y) / point.z };
-	return projectedPoint;
-}
-
 void Update(void) {
 
 	int timeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - previousFrameTime);
@@ -87,12 +87,12 @@ void Update(void) {
 	previousFrameTime = SDL_GetTicks();
 
 	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
-	mesh.scale.x += 0.002;
+	/*mesh.rotation.y += 0.01;
+	mesh.rotation.z += 0.01;*/
+	/*mesh.scale.x += 0.002;
 	mesh.scale.y += 0.002;
 	mesh.scale.z += 0.002;
-	mesh.translation.x += 0.01;
+	mesh.translation.x += 0.01;*/
 	mesh.translation.z = 5.0;
 
 	mat4x4 scaleMatrix = mat4x4MakeScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -159,15 +159,16 @@ void Update(void) {
 				continue;
 		}
 
-		vec2 projectedPoints[3];
+		vec4 projectedPoints[3];
 
 		for (int j = 0; j < 3; j++) {
-			projectedPoints[j] = Project(Vec3FromVec4(transformedVertices[j]));
+			projectedPoints[j] = mat4x4MultVec4Project(projectionMatrix,transformedVertices[j]);
 
-			projectedPoints[j].x += windowWidth / 2;
-			projectedPoints[j].y += windowHeight / 2;
-
-			//projectedTriangle.points[j] = projectedVertex;
+			projectedPoints[j].x *= windowWidth / 2.0;
+			projectedPoints[j].y *= windowHeight / 2.0;
+			
+			projectedPoints[j].x += windowWidth / 2.0;
+			projectedPoints[j].y += windowHeight / 2.0;
 		}
 
 		float avgDepth = (transformedVertices[0].z + transformedVertices[1].z + transformedVertices[2].z) / 3.0;
