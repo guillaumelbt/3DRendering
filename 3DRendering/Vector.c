@@ -9,8 +9,8 @@ float Vec2Lenght(vec2 v)
 vec2 Vec2Add(vec2 a, vec2 b)
 {
 	vec2 result = {
-			a.x + b.x,
-			a.y + b.y
+		a.x + b.x,
+		a.y + b.y
 	};
 	return result;
 }
@@ -18,8 +18,8 @@ vec2 Vec2Add(vec2 a, vec2 b)
 vec2 Vec2Sub(vec2 a, vec2 b)
 {
 	vec2 result = {
-			a.x - b.x,
-			a.y - b.y
+		a.x - b.x,
+		a.y - b.y
 	};
 	return result;
 }
@@ -27,8 +27,8 @@ vec2 Vec2Sub(vec2 a, vec2 b)
 vec2 Vec2Mul(vec2 a, float f)
 {
 	vec2 result = {
-			a.x * f,
-			a.y * f
+		a.x * f,
+		a.y * f
 	};
 	return result;
 }
@@ -36,8 +36,8 @@ vec2 Vec2Mul(vec2 a, float f)
 vec2 Vec2Div(vec2 a, float f)
 {
 	vec2 result = {
-			a.x / f,
-			a.y / f
+		a.x / f,
+		a.y / f
 	};
 	return result;
 }
@@ -139,4 +139,22 @@ void Vec3Normalize(vec3* v) {
 	v->x /= length;
 	v->y /= length;
 	v->z /= length;
+}
+
+vec3 Vec3FromVec4(vec4 v)
+{
+	vec3 res =
+	{
+		v.x, v.y, v.z
+	};
+	return res;
+}
+
+vec4 Vec4FromVec3(vec3 v)
+{
+	vec4 res =
+	{
+		v.x, v.y, v.z, 1.0
+	};
+	return res;
 }
