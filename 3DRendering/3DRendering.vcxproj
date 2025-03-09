@@ -149,6 +149,8 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="Matrix.c" />
     <ClCompile Include="Mesh.c" />
+    <ClCompile Include="Texture.c" />
+    <ClCompile Include="Texture.h" />
     <ClCompile Include="Triangle.c" />
     <ClCompile Include="utils.c" />
     <ClCompile Include="Vector.c" />

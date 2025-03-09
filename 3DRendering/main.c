@@ -4,6 +4,7 @@
 #include "array.h"
 #include "Matrix.h"
 #include "Light.h"
+#include "Texture.h"
 
 triangle* trianglesToRender = NULL;
 
@@ -19,7 +20,7 @@ mat4x4 projectionMatrix;
 void Setup(void) {
 
 	//renderMethod |= RENDER_WIRE; 
-	renderMethod |= RENDER_TRIANGLE_FILLED;
+	renderMethod |= RENDER_TRIANGLE_TEXTURED;
 	cullMethod = CULL_BACKFACE;
 
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
@@ -43,8 +44,12 @@ void Setup(void) {
 		bIsRunning = false;
 	}
 
-	LoadObjFileData("Assets/f22.obj");
-	//LoadCubeMeshData();
+	//LoadObjFileData("Assets/cube.obj");
+	LoadCubeMeshData();
+
+	meshTexture = (uint32_t*)REDBRICK_TEXTURE;
+	texWidth = 64;
+	texHeight = 64;
 	/*int pointCount = 0;
 	for (float x = -1; x <= 1; x += 0.25) {
 		for (float y = -1; y <= 1; y += 0.25) {
@@ -69,7 +74,19 @@ void ProcessInput(void) {
 		case SDLK_ESCAPE:
 			bIsRunning = false;
 			break;
+		case SDLK_1:
+			renderMethod |= RENDER_WIRE;
+			break;
+		case SDLK_2:
+			renderMethod |= RENDER_TRIANGLE_FILLED;
+			break;
+		case SDLK_3:
+			renderMethod |= RENDER_TRIANGLE_TEXTURED;
+			break;
+		case SDLK_d:
+			cullMethod = !cullMethod;
 		}
+	
 		break;
 	}
 
@@ -87,9 +104,9 @@ void Update(void) {
 
 	previousFrameTime = SDL_GetTicks();
 
-	mesh.rotation.x += 0.02;
-	mesh.rotation.y += 0.02;
-	mesh.rotation.z += 0.02;
+	mesh.rotation.x += 0.01;
+	mesh.rotation.y += 0.01;
+	mesh.rotation.z += 0.01;
 	/*mesh.scale.x += 0.002;
 	mesh.scale.y += 0.002;
 	mesh.scale.z += 0.002;
@@ -166,9 +183,11 @@ void Update(void) {
 		for (int j = 0; j < 3; j++) {
 			projectedPoints[j] = mat4x4MultVec4Project(projectionMatrix,transformedVertices[j]);
 
+			projectedPoints[j].y *= -1;
+
 			projectedPoints[j].x *= windowWidth / 2.0;
 			projectedPoints[j].y *= windowHeight / 2.0;
-			
+
 			projectedPoints[j].x += windowWidth / 2.0;
 			projectedPoints[j].y += windowHeight / 2.0;
 		}
@@ -182,9 +201,14 @@ void Update(void) {
 		triangle projectedTriangle =
 		{
 			{
-				{ projectedPoints[0].x, projectedPoints[0].y},
-				{ projectedPoints[1].x, projectedPoints[1].y},
-				{ projectedPoints[2].x, projectedPoints[2].y},
+				{ projectedPoints[0].x, projectedPoints[0].y, projectedPoints[0].z, projectedPoints[0].w},
+				{ projectedPoints[1].x, projectedPoints[1].y, projectedPoints[1].z, projectedPoints[1].w},
+				{ projectedPoints[2].x, projectedPoints[2].y, projectedPoints[2].z, projectedPoints[2].w},
+			},
+			{
+				{meshFace.a_uv.u,meshFace.a_uv.v},
+				{meshFace.b_uv.u,meshFace.b_uv.v},
+				{meshFace.c_uv.u,meshFace.c_uv.v},
 			},
 			triangleColor,
 			avgDepth
@@ -222,6 +246,14 @@ void Render(void) {
 
 		if (renderMethod & RENDER_TRIANGLE_FILLED)
 			DrawFilledTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, tri.color);
+
+		if (renderMethod & RENDER_TRIANGLE_TEXTURED)
+			DrawTexturedTriangle(
+				tri.points[0].x, tri.points[0].y, tri.points[0].z, tri.points[0].w, tri.texCoords[0].u, tri.texCoords[0].v,
+				tri.points[1].x, tri.points[1].y, tri.points[1].z, tri.points[1].w, tri.texCoords[1].u, tri.texCoords[1].v,
+				tri.points[2].x, tri.points[2].y, tri.points[2].z, tri.points[2].w, tri.texCoords[2].u, tri.texCoords[2].v,
+				meshTexture
+			);
 
 		if (renderMethod & RENDER_WIRE)
 			DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, tri.color);

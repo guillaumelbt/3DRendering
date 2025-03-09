@@ -158,3 +158,12 @@ vec4 Vec4FromVec3(vec3 v)
 	};
 	return res;
 }
+
+vec2 Vec2FromVec4(vec4 v)
+{
+	vec2 res =
+	{
+		v.x, v.y
+	};
+	return res;
+}

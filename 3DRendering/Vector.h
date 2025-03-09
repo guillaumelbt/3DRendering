@@ -39,6 +39,6 @@ vec3 RotateY(vec3 v, float angle);
 vec3 RotateZ(vec3 v, float angle);
 void Vec3Normalize(vec3* v);
 vec3 Vec3FromVec4(vec4 v);
-
+vec2 Vec2FromVec4(vec4 v);
 vec4 Vec4FromVec3(vec3 v);
 #endif
