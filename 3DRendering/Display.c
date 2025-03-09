@@ -105,7 +105,7 @@ void DrawLine(int x0, int y0, int x1, int y1, uint32_t color) {
 	float curX = x0;
 	float curY = y0;
 
-	for (size_t i = 0; i < sideLength; i++)
+	for (size_t i = 0; i <= sideLength; i++)
 	{
 		DrawPixel(round(curX), round(curY), color);
 		curX += xInc;

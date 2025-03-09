@@ -3,6 +3,7 @@
 #include "Mesh.h"
 #include "array.h"
 #include "Matrix.h"
+#include "Light.h"
 
 triangle* trianglesToRender = NULL;
 
@@ -17,9 +18,9 @@ mat4x4 projectionMatrix;
 
 void Setup(void) {
 
-	renderMethod |= RENDER_WIRE; 
-	//renderMethod |= RENDER_TRIANGLE_FILLED;
-	//cullMethod = CULL_BACKFACE;
+	//renderMethod |= RENDER_WIRE; 
+	renderMethod |= RENDER_TRIANGLE_FILLED;
+	cullMethod = CULL_BACKFACE;
 
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
 
@@ -42,8 +43,8 @@ void Setup(void) {
 		bIsRunning = false;
 	}
 
-	//LoadObjFileData("Assets/f22.obj");
-	LoadCubeMeshData();
+	LoadObjFileData("Assets/f22.obj");
+	//LoadCubeMeshData();
 	/*int pointCount = 0;
 	for (float x = -1; x <= 1; x += 0.25) {
 		for (float y = -1; y <= 1; y += 0.25) {
@@ -86,9 +87,9 @@ void Update(void) {
 
 	previousFrameTime = SDL_GetTicks();
 
-	mesh.rotation.x += 0.01;
-	/*mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;*/
+	mesh.rotation.x += 0.02;
+	mesh.rotation.y += 0.02;
+	mesh.rotation.z += 0.02;
 	/*mesh.scale.x += 0.002;
 	mesh.scale.y += 0.002;
 	mesh.scale.z += 0.002;
@@ -137,24 +138,25 @@ void Update(void) {
 			transformedVertices[j] = transformedVertex;
 		}
 
+		
+		vec3 a = Vec3FromVec4(transformedVertices[0]);
+		vec3 b = Vec3FromVec4(transformedVertices[1]);
+		vec3 c = Vec3FromVec4(transformedVertices[2]);
+
+		vec3 ab = Vec3Sub(b, a);
+		vec3 ac = Vec3Sub(c, a);
+		Vec3Normalize(&ab);
+		Vec3Normalize(&ac);
+
+
+		vec3 normal = Vec3CrossProduct(ab, ac);
+		Vec3Normalize(&normal);
+
+		vec3 cameraRay = Vec3Sub(a, cameraPosition);
+		float dot = Vec3Dot(normal, cameraRay);
+
 		if (cullMethod == CULL_BACKFACE)
 		{
-			vec3 a = Vec3FromVec4(transformedVertices[0]);
-			vec3 b = Vec3FromVec4(transformedVertices[1]);
-			vec3 c = Vec3FromVec4(transformedVertices[2]);
-
-			vec3 ab = Vec3Sub(b, a);
-			vec3 ac = Vec3Sub(c, a);
-			Vec3Normalize(&ab);
-			Vec3Normalize(&ac);
-
-
-			vec3 normal = Vec3CrossProduct(ab, ac);
-			Vec3Normalize(&normal);
-
-			vec3 cameraRay = Vec3Sub(a, cameraPosition);
-			float dot = Vec3Dot(normal, cameraRay);
-
 			if (dot > 0)
 				continue;
 		}
@@ -173,6 +175,10 @@ void Update(void) {
 
 		float avgDepth = (transformedVertices[0].z + transformedVertices[1].z + transformedVertices[2].z) / 3.0;
 
+		float lightIntensityFactor =  -Vec3Dot(normal,mainLight.direction);
+
+		uint32_t triangleColor = LightApplyIntensity(meshFace.color, lightIntensityFactor);
+
 		triangle projectedTriangle =
 		{
 			{
@@ -180,7 +186,7 @@ void Update(void) {
 				{ projectedPoints[1].x, projectedPoints[1].y},
 				{ projectedPoints[2].x, projectedPoints[2].y},
 			},
-			meshFace.color,
+			triangleColor,
 			avgDepth
 		};
 
@@ -218,7 +224,7 @@ void Render(void) {
 			DrawFilledTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, tri.color);
 
 		if (renderMethod & RENDER_WIRE)
-			DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, 0xFFFFFFFF);
+			DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, tri.color);
 	}
 
 	array_free(trianglesToRender);

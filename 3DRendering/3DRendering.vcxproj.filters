@@ -39,6 +39,9 @@
     <ClCompile Include="Matrix.c">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Light.c">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vector.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="Matrix.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Fichiers sources</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

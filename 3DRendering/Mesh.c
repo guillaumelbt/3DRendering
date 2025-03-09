@@ -25,16 +25,16 @@ vec3 cubeVertices[N_CUBE_VERTICES] = {
 face cubeFaces[N_CUBE_FACES] = {
    {.a = 1, .b = 2, .c = 3, .color = 0xFFFF0000 },
    {.a = 1, .b = 3, .c = 4, .color = 0xFFFF0000 },
-   {.a = 4, .b = 3, .c = 5, .color = 0xFF00FF00 },
-   {.a = 4, .b = 5, .c = 6, .color = 0xFF00FF00 },
-   {.a = 6, .b = 5, .c = 7, .color = 0xFF0000FF },
-   {.a = 6, .b = 7, .c = 8, .color = 0xFF0000FF },
-   {.a = 8, .b = 7, .c = 2, .color = 0xFFFFFF00 },
-   {.a = 8, .b = 2, .c = 1, .color = 0xFFFFFF00 },
-   {.a = 2, .b = 7, .c = 5, .color = 0xFFFF00FF },
-   {.a = 2, .b = 5, .c = 3, .color = 0xFFFF00FF },
-   {.a = 6, .b = 8, .c = 1, .color = 0xFF00FFFF },
-   {.a = 6, .b = 1, .c = 4, .color = 0xFF00FFFF }
+   {.a = 4, .b = 3, .c = 5, .color = 0xFFFF0000 },
+   {.a = 4, .b = 5, .c = 6, .color = 0xFFFF0000 },
+   {.a = 6, .b = 5, .c = 7, .color = 0xFFFF0000 },
+   {.a = 6, .b = 7, .c = 8, .color = 0xFFFF0000 },
+   {.a = 8, .b = 7, .c = 2, .color = 0xFFFF0000 },
+   {.a = 8, .b = 2, .c = 1, .color = 0xFFFF0000 },
+   {.a = 2, .b = 7, .c = 5, .color = 0xFFFF0000 },
+   {.a = 2, .b = 5, .c = 3, .color = 0xFFFF0000 },
+   {.a = 6, .b = 8, .c = 1, .color = 0xFFFF0000 },
+   {.a = 6, .b = 1, .c = 4, .color = 0xFFFF0000 }
 };
 
 void LoadCubeMeshData(void) {
@@ -80,6 +80,7 @@ void LoadObjFileData(char* filename) {
 				face.a = a; 
 				face.b = b; 
 				face.c = c;
+				face.color = 0xFFFFFFFFF;
 				array_push(mesh.faces, face);
 			}
 		}
