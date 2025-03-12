@@ -152,6 +152,7 @@
     <ClCompile Include="Texture.c" />
     <ClCompile Include="Texture.h" />
     <ClCompile Include="Triangle.c" />
+    <ClCompile Include="upng.c" />
     <ClCompile Include="utils.c" />
     <ClCompile Include="Vector.c" />
   </ItemGroup>
@@ -162,6 +163,7 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Triangle.h" />
+    <ClInclude Include="upng.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>

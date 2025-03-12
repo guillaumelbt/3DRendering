@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "upng.h"
 
 typedef struct
 {
@@ -14,8 +15,9 @@ typedef struct
 extern int texWidth;
 extern int texHeight;
 
-extern const uint8_t REDBRICK_TEXTURE[];
 extern uint32_t* meshTexture;
+extern upng_t* pngTexture;
 
+void LoadPngData(char* filename);
 
 #endif

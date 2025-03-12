@@ -5,6 +5,7 @@
 #include "Matrix.h"
 #include "Light.h"
 #include "Texture.h"
+#include "upng.h"
 
 triangle* trianglesToRender = NULL;
 
@@ -47,18 +48,8 @@ void Setup(void) {
 	//LoadObjFileData("Assets/cube.obj");
 	LoadCubeMeshData();
 
-	meshTexture = (uint32_t*)REDBRICK_TEXTURE;
-	texWidth = 64;
-	texHeight = 64;
-	/*int pointCount = 0;
-	for (float x = -1; x <= 1; x += 0.25) {
-		for (float y = -1; y <= 1; y += 0.25) {
-			for (float z = -1; z <= 1; z += 0.25) {
-				vec3 newPoint = { x , y , z };
-				cubePoints[pointCount++] = newPoint;
-			}
-		}
-	}*/
+	LoadPngData("Assets/cube.png");
+
 }
 
 void ProcessInput(void) {
@@ -75,16 +66,25 @@ void ProcessInput(void) {
 			bIsRunning = false;
 			break;
 		case SDLK_1:
-			renderMethod |= RENDER_WIRE;
+			renderMethod ^= RENDER_WIRE;
 			break;
 		case SDLK_2:
-			renderMethod |= RENDER_TRIANGLE_FILLED;
+			renderMethod ^= RENDER_TRIANGLE_FILLED;
+			if (renderMethod & RENDER_TRIANGLE_FILLED) 
+			{
+				renderMethod &= ~RENDER_TRIANGLE_TEXTURED;
+			}
 			break;
 		case SDLK_3:
-			renderMethod |= RENDER_TRIANGLE_TEXTURED;
+			renderMethod ^= RENDER_TRIANGLE_TEXTURED;
+			if (renderMethod & RENDER_TRIANGLE_TEXTURED) 
+			{
+				renderMethod &= ~RENDER_TRIANGLE_FILLED;
+			}
 			break;
 		case SDLK_d:
 			cullMethod = !cullMethod;
+			break;
 		}
 	
 		break;
@@ -222,7 +222,6 @@ void Update(void) {
 	if (numTriangles > 1) {
 		QuickSortTriangles(trianglesToRender, 0, numTriangles - 1);
 	}
-
 }
 
 void Render(void) {
@@ -238,7 +237,6 @@ void Render(void) {
 
 		if (renderMethod & RENDER_VERTEX)
 		{
-			//vec2 projectedPoint = projectedPoints[i];
 			DrawRectangle(tri.points[0].x, tri.points[0].y, 3, 3, 0xFFFF3333);
 			DrawRectangle(tri.points[1].x, tri.points[1].y, 3, 3, 0xFFFF3333);
 			DrawRectangle(tri.points[2].x, tri.points[2].y, 3, 3, 0xFFFF3333);
@@ -269,6 +267,7 @@ void Render(void) {
 
 void FreeResources(void) {
 	free(colorBuffer);
+	upng_free(pngTexture); 
 	array_free(mesh.faces);
 	array_free(mesh.vertices);
 }
