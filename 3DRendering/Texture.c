@@ -2,6 +2,7 @@
 
 int texWidth = 64;
 int texHeight = 64;
+
 uint32_t* meshTexture = NULL;
 upng_t* pngTexture = NULL;
 

@@ -29,6 +29,8 @@ extern SDL_Renderer* renderer;
 extern SDL_Texture* colorBufferTexture;
 extern uint32_t* colorBuffer;
 
+extern float* zBuffer;
+
 extern int windowWidth;
 extern int windowHeight;
 
@@ -38,6 +40,7 @@ void DrawPixel(int x, int y, uint32_t color);
 void DrawRectangle(int x, int y, int width, int height, uint32_t color);
 void RenderColorBuffer(void);
 void ClearColorBuffer(uint32_t color);
+void ClearZBuffer();
 void DestroyWindow(void);
 void DrawLine(int x0, int y0, int x1, int y1, uint32_t color);
 

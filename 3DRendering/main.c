@@ -20,11 +20,12 @@ mat4x4 projectionMatrix;
 
 void Setup(void) {
 
-	//renderMethod |= RENDER_WIRE; 
-	renderMethod |= RENDER_TRIANGLE_TEXTURED;
+	renderMethod |= RENDER_WIRE; 
+	//renderMethod |= RENDER_TRIANGLE_TEXTURED;
 	cullMethod = CULL_BACKFACE;
 
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
+	zBuffer = (float*)malloc(sizeof(float) * windowWidth * windowHeight);
 
 	colorBufferTexture = SDL_CreateTexture(
 		renderer,
@@ -45,10 +46,10 @@ void Setup(void) {
 		bIsRunning = false;
 	}
 
-	//LoadObjFileData("Assets/cube.obj");
-	LoadCubeMeshData();
+	LoadObjFileData("Assets/f22.obj");
+	//LoadCubeMeshData();
 
-	LoadPngData("Assets/cube.png");
+	LoadPngData("Assets/f22.png");
 
 }
 
@@ -129,9 +130,9 @@ void Update(void) {
 		//printf_s("%d\n", mesh.faces[i].a);
 
 		vec3 faceVertices[3];
-		faceVertices[0] = mesh.vertices[meshFace.a - 1];
-		faceVertices[1] = mesh.vertices[meshFace.b - 1];
-		faceVertices[2] = mesh.vertices[meshFace.c - 1];
+		faceVertices[0] = mesh.vertices[meshFace.a -1];
+		faceVertices[1] = mesh.vertices[meshFace.b -1];
+		faceVertices[2] = mesh.vertices[meshFace.c -1];
 
 		
 		vec4 transformedVertices[3];
@@ -261,12 +262,14 @@ void Render(void) {
 
 	RenderColorBuffer();
 	ClearColorBuffer(0xFF000000);
+	ClearZBuffer();
 
 	SDL_RenderPresent(renderer);
 }
 
 void FreeResources(void) {
 	free(colorBuffer);
+	free(zBuffer);
 	upng_free(pngTexture); 
 	array_free(mesh.faces);
 	array_free(mesh.vertices);

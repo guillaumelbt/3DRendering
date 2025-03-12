@@ -56,7 +56,7 @@ void DrawFilledTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t
 	else
 	{
 		int My = y1;
-		int Mx = x0 + ((x2 - x0) * (y1 - y0)) / (y2 - y0);
+		int Mx = (((x2 - x0) * (y1 - y0)) / (y2 - y0)) + x0;
 
 		FillFlatBottomTriangle(x0, y0, x1, y1, Mx, My, color);
 
@@ -108,10 +108,17 @@ void DrawTexel(int x, int y, uint32_t* tex,vec4 a, vec4 b, vec4 c, tex2 a_uv, te
 	interpolatedU /= interpolatedReciprocalW;
 	interpolatedV /= interpolatedReciprocalW;
 
-	int xTex = abs((int)(interpolatedU * texWidth));
-	int yTex = abs((int)(interpolatedV * texHeight));
+	int xTex = abs((int)(interpolatedU * texWidth)) % texWidth;
+	int yTex = abs((int)(interpolatedV * texHeight)) % texHeight;
 
-	DrawPixel(x, y, tex[(texWidth * yTex) + xTex]);
+	interpolatedReciprocalW = 1.0 - interpolatedReciprocalW;
+
+	if (zBuffer[(windowWidth * y) + x] > interpolatedReciprocalW)
+	{
+		DrawPixel(x, y, tex[(texWidth * yTex) + xTex]);
+
+		zBuffer[(windowWidth * y) + x] = interpolatedReciprocalW;
+	}
 }
 
 void DrawTexturedTriangle(
@@ -147,6 +154,10 @@ void DrawTexturedTriangle(
 		Swap(&u0, &u1, float);
 		Swap(&v0, &v1, float);
 	}
+
+	v0 = 1.0 - v0;
+	v1 = 1.0 - v1;
+	v2 = 1.0 - v2;
 
 	vec4 a = { x0, y0, z0, w0};
 	vec4 b = { x1, y1, z1, w1};

@@ -60,31 +60,44 @@ void LoadObjFileData(char* filename) {
 		return -1;
 	}
 
+	tex2* texCoords = NULL;
+
 	char line[256];
 	while (fgets(line, sizeof(line), file))
 	{
-		if (line[0] == 'v') {
-			float x, y, z;
-			int scanCount = sscanf_s(line, "v %f %f %f ", &x, &y, &z);
-			if (scanCount == 3) {
-				vec3 vertex;
-				vertex.x = x; vertex.y = y; vertex.z = z;
-				array_push(mesh.vertices, vertex);
-			}
+		if (!strncmp(line, "v ", 2)) {
+			vec3 vertex;
+			sscanf_s(line, "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
+			array_push(mesh.vertices, vertex);
 		}
-		if (line[0] == 'f') {
-			int a, b, c;
-			int scanCount = sscanf_s(line, "%*s %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &a, &b, &c);
-			if (scanCount == 3) {
-				face face;
-				face.a = a; 
-				face.b = b; 
-				face.c = c;
-				face.color = 0xFFFFFFFFF;
-				array_push(mesh.faces, face);
-			}
+		if (!strncmp(line,"vt ",3)) {
+			tex2 texCoord;
+			sscanf_s(line, "vt %f %f", &texCoord.u , &texCoord.v);
+			array_push(texCoords, texCoord);
+		}
+
+		if (!strncmp(line, "f ", 2)) {
+			int vertex_indices[3];
+			int texture_indices[3];
+			int normal_indices[3];
+			sscanf_s(
+				line, "f %d/%d/%d %d/%d/%d %d/%d/%d",
+				&vertex_indices[0], &texture_indices[0], &normal_indices[0],
+				&vertex_indices[1], &texture_indices[1], &normal_indices[1],
+				&vertex_indices[2], &texture_indices[2], &normal_indices[2]
+			);
+			face face = {
+				.a = vertex_indices[0],
+				.b = vertex_indices[1],
+				.c = vertex_indices[2],
+				.a_uv = texCoords[texture_indices[0] - 1],
+				.b_uv = texCoords[texture_indices[1] - 1],
+				.c_uv = texCoords[texture_indices[2] - 1],
+				.color = 0xFFFFFFFF
+			};
+			array_push(mesh.faces, face);
 		}
 	}
-
+	array_free(texCoords);
 	fclose(file);	
 }
