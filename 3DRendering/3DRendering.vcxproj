@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="array.c" />
+    <ClCompile Include="Camera.c" />
     <ClCompile Include="Display.c" />
     <ClCompile Include="Light.c" />
     <ClCompile Include="main.c" />
@@ -158,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Matrix.h" />

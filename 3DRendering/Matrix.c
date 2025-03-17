@@ -113,3 +113,23 @@ vec4 mat4x4MultVec4Project(mat4x4 projectionMatrix, vec4 v)
 	}
 	return res;
 }
+
+mat4x4 mat4x4LookAt(vec3 e, vec3 target, vec3 up)
+{
+	vec3 z = Vec3Sub(target, e);
+	Vec3Normalize(&z);
+	vec3 x = Vec3CrossProduct(up, z);
+	Vec3Normalize(&x);
+	vec3 y = Vec3CrossProduct(z, x);
+
+	mat4x4 viewMatrix = 
+	{ 
+		{
+			{ x.x, x.y, x.z, -Vec3Dot(x, e) },
+			{ y.x, y.y, y.z, -Vec3Dot(y, e) },
+			{ z.x, z.y, z.z, -Vec3Dot(z, e) },
+			{ 0, 0, 0, 1 }
+		}	
+	};
+	return viewMatrix;
+}

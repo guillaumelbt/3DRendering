@@ -18,4 +18,5 @@ mat4x4 mat4x4MakePerspective(float fov, float aspectRatio, float zNear, float zF
 vec4 mat4x4MultVec4Project(mat4x4 projectionMatrix, vec4 v);
 vec4 mat4x4MultVec4(mat4x4 m, vec4 v);
 mat4x4 mat4x4Mult(mat4x4 a, mat4x4 b);
+mat4x4 mat4x4LookAt(vec3 e, vec3 target, vec3 up);
 #endif

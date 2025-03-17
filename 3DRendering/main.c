@@ -6,22 +6,28 @@
 #include "Light.h"
 #include "Texture.h"
 #include "upng.h"
+#include "Camera.h"
 
-triangle* trianglesToRender = NULL;
+#define MAX_TRIANGLES 10000
+triangle trianglesToRender[MAX_TRIANGLES];
+int numTrianglesToRender = 0;
 
 bool bIsRunning = false;
 
 float previousFrameTime = 0;
+float deltaTime = 0;
 
 //triangle trianglesToRender[N_MESH_FACES];
 
-vec3 cameraPosition = { 0 , 0 , 0 };
+//vec3 cameraPosition = { 0 , 0 , 0 };
 mat4x4 projectionMatrix;
+mat4x4 viewMatrix;
+mat4x4 worldMatrix;
 
 void Setup(void) {
 
-	renderMethod |= RENDER_WIRE; 
-	//renderMethod |= RENDER_TRIANGLE_TEXTURED;
+	//renderMethod |= RENDER_WIRE; 
+	renderMethod |= RENDER_TRIANGLE_TEXTURED;
 	cullMethod = CULL_BACKFACE;
 
 	colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
@@ -83,11 +89,32 @@ void ProcessInput(void) {
 				renderMethod &= ~RENDER_TRIANGLE_FILLED;
 			}
 			break;
-		case SDLK_d:
+		case SDLK_4:
 			cullMethod = !cullMethod;
+			break;
+		case SDLK_UP:
+			camera.position.y += 3.0 * deltaTime;
+			break;
+		case  SDLK_DOWN:
+			camera.position.y -= 3.0 * deltaTime;
+			break;
+		case  SDLK_q:
+			camera.yaw -= 1.0 * deltaTime;
+			break;
+		case  SDLK_d:
+			camera.yaw += 1.0 * deltaTime;
+			break;
+		case  SDLK_z:
+			camera.velocity = Vec3Mul(camera.direction, 5.0 * deltaTime);
+			camera.position = Vec3Add(camera.position, camera.velocity);
+			break;
+		case  SDLK_s:
+			camera.velocity = Vec3Mul(camera.direction, 5.0 * deltaTime);
+			camera.position = Vec3Add(camera.position, camera.velocity);
 			break;
 		}
 	
+		
 		break;
 	}
 
@@ -101,18 +128,25 @@ void Update(void) {
 		SDL_Delay(timeToWait);
 	}
 
-	trianglesToRender = NULL;
+	deltaTime = (SDL_GetTicks() - previousFrameTime) / 1000.0;
+	previousFrameTime = SDL_GetTicks();
+
+	numTrianglesToRender = 0;
 
 	previousFrameTime = SDL_GetTicks();
 
-	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
+	mesh.rotation.x += 0.1 * deltaTime;
+	mesh.rotation.y += 0.1 * deltaTime;
+	mesh.rotation.z += 0.1 * deltaTime;
 	/*mesh.scale.x += 0.002;
 	mesh.scale.y += 0.002;
 	mesh.scale.z += 0.002;
 	mesh.translation.x += 0.01;*/
 	mesh.translation.z = 5.0;
+
+	vec3 target = { 0,0,1 };
+	mat4x4 cameraYawRotation = mat4x4RotateY(camera.yaw);
+	camera.direction = Vec3FromVec4(mat4x4MultVec4(cameraYawRotation, Vec4FromVec3(target)));
 
 	mat4x4 scaleMatrix = mat4x4MakeScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
 	mat4x4 translationMatrix = mat4x4MakeTranslation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
@@ -120,6 +154,10 @@ void Update(void) {
 	mat4x4 yRotationMatrix = mat4x4RotateY(mesh.rotation.y);
 	mat4x4 zRotationMatrix = mat4x4RotateZ(mesh.rotation.z);
 
+	target = Vec3Add(camera.position, camera.direction);
+	vec3 upDir = { 0,1,0 };
+
+	viewMatrix = mat4x4LookAt(camera.position, target, upDir);
 
 	int numFaces = array_length(mesh.faces);
 
@@ -141,7 +179,7 @@ void Update(void) {
 			vec4 transformedVertex = Vec4FromVec3(faceVertices[j]);
 
 
-			mat4x4 worldMatrix = Mat4x4Identity();
+			worldMatrix = Mat4x4Identity();
 
 			worldMatrix = mat4x4Mult(scaleMatrix, worldMatrix);
 			worldMatrix = mat4x4Mult(zRotationMatrix, worldMatrix);
@@ -150,6 +188,8 @@ void Update(void) {
 			worldMatrix = mat4x4Mult(translationMatrix, worldMatrix);
 
 			transformedVertex = mat4x4MultVec4(worldMatrix, transformedVertex);
+
+			transformedVertex = mat4x4MultVec4(viewMatrix, transformedVertex);
 
 			//transformedVertex.z += 5;
 
@@ -170,7 +210,8 @@ void Update(void) {
 		vec3 normal = Vec3CrossProduct(ab, ac);
 		Vec3Normalize(&normal);
 
-		vec3 cameraRay = Vec3Sub(a, cameraPosition);
+		vec3 origin = { 0,0,0 };
+		vec3 cameraRay = Vec3Sub(a, origin);
 		float dot = Vec3Dot(normal, cameraRay);
 
 		if (cullMethod == CULL_BACKFACE)
@@ -215,14 +256,18 @@ void Update(void) {
 			avgDepth
 		};
 
+		if (numTrianglesToRender < MAX_TRIANGLES)
+		{
+			trianglesToRender[numTrianglesToRender++] = projectedTriangle;
+		}
 
-		array_push(trianglesToRender, projectedTriangle);
+		//array_push(trianglesToRender, projectedTriangle);
 	}
 
-	int numTriangles = array_length(trianglesToRender);
-	if (numTriangles > 1) {
-		QuickSortTriangles(trianglesToRender, 0, numTriangles - 1);
-	}
+	//int numTriangles = array_length(trianglesToRender);
+	//if (numTriangles > 1) {
+	//	QuickSortTriangles(trianglesToRender, 0, numTriangles - 1);
+	//}
 }
 
 void Render(void) {
@@ -231,9 +276,8 @@ void Render(void) {
 
 	DrawGrid();
 
-	int numTriangles = array_length(trianglesToRender);
 
-	for (int i = 0; i < numTriangles; i++) {
+	for (int i = 0; i < numTrianglesToRender; i++) {
 		triangle tri = trianglesToRender[i];
 
 		if (renderMethod & RENDER_VERTEX)
@@ -244,7 +288,10 @@ void Render(void) {
 		}
 
 		if (renderMethod & RENDER_TRIANGLE_FILLED)
-			DrawFilledTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, tri.color);
+			DrawFilledTriangle(tri.points[0].x, tri.points[0].y, tri.points[0].z, tri.points[0].w, 
+				tri.points[1].x, tri.points[1].y, tri.points[1].z, tri.points[1].w, 
+				tri.points[2].x, tri.points[2].y, tri.points[2].z, tri.points[2].w, 
+				tri.color);
 
 		if (renderMethod & RENDER_TRIANGLE_TEXTURED)
 			DrawTexturedTriangle(
@@ -258,7 +305,7 @@ void Render(void) {
 			DrawTriangle(tri.points[0].x, tri.points[0].y, tri.points[1].x, tri.points[1].y, tri.points[2].x, tri.points[2].y, tri.color);
 	}
 
-	array_free(trianglesToRender);
+	//array_free(trianglesToRender);
 
 	RenderColorBuffer();
 	ClearColorBuffer(0xFF000000);
